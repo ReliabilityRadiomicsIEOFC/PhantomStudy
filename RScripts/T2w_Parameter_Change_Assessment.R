@@ -1,6 +1,7 @@
 set.seed(5)
 
 data_dir <- "<Folder_with_TE_TR_Experiment_Radiomics_Output>/" # put folder path here TE and TR Experimentradiomic output files are located
+data_dir <- "/Users/joaosantinha/Documents/FChampalimaud/Data/Phantom/PhantomStudy/RadiomicFiles/CCU1_5T_TE_TR/" # put folder path here TE and TR Experimentradiomic output files are located
 sep <- "," # choose separator
 
 ## Load doMC libraries
@@ -12,6 +13,8 @@ if (!is.null(sysinf)){
     registerDoMC(cores=4)
   }
 }
+
+library(DescTools)
 
 options(show.error.locations = TRUE) # debug
 options(error=traceback)
@@ -72,7 +75,7 @@ for (i in 1:9) {
 correlation_coefficients_agreement <- list()
 for (k in 1:8) {
   for (m in (k+1):9) {
-    correlation_coefficients_agreement[(k-1)*9+m] <- list(sapply(seq.int(dim(acq[[k]])[2]), function(i) psych::ICC(cbind(acq[[k]][i], acq[[m]][i]))$results$ICC[1]))
+    correlation_coefficients_agreement[(k-1)*9+m] <- list(sapply(seq.int(dim(acq[[k]])[2]), function(i) DescTools::CCC(unlist(acq[[k]][i]), unlist(acq[[m]][i]))$rho.c$est))
     names(correlation_coefficients_agreement[[(k-1)*9+m]]) <- colnames(rf_acq[[1]])
     if (k == 1 && m == 2) {
       correlation_coefficients_agreement_excellent_acq1 <- names(correlation_coefficients_agreement[[(k-1)*9+m]][correlation_coefficients_agreement[[(k-1)*9+m]] > 0.9])
@@ -81,7 +84,9 @@ for (k in 1:8) {
     }
   }
 }
-par(mfrow=c(2,2))
+
+# par(mfrow=c(2,2))
+dev.off()
 library(corrplot)
 # Excellent aggreement
 correlation_matrix_agreement_exc <- matrix(nrow = 9, ncol = 9, dimnames = list(c('80', '85', '90', '95', '100', '105', '110', '115', '120'),c('80', '85', '90', '95', '100', '105', '110', '115', '120'))) 
@@ -94,8 +99,7 @@ for (k in 1:8) {
 correlation_matrix_agreement_exc[is.na(correlation_matrix_agreement_exc)] <- 0
 
 corrplot(correlation_matrix_agreement_exc/ncol(dataset_80_features)*100, method = "number", type = "upper", tl.pos = "d", 
-         is.corr = FALSE, title="A (%)", mar=c(0,0,2,0), cl.lim = c(0, 100))
-
+         is.corr = FALSE, title="A (%)", mar=c(0,0,2,0), cl.lim = c(-10, 100))
 
 # Good aggreement
 correlation_matrix_agreement_good <- matrix(nrow = 9, ncol = 9, dimnames = list(c('80', '85', '90', '95', '100', '105', '110', '115', '120'),c('80', '85', '90', '95', '100', '105', '110', '115', '120'))) 
@@ -108,8 +112,7 @@ for (k in 1:8) {
 correlation_matrix_agreement_good[is.na(correlation_matrix_agreement_good)] <- 0
 
 corrplot(correlation_matrix_agreement_good/ncol(dataset_80_features)*100, method = "number", type = "upper", tl.pos = "d", 
-         is.corr = FALSE, title="B (%)", mar=c(0,0,2,0), cl.lim = c(-5, 40))
-
+         is.corr = FALSE, title="B (%)", mar=c(0,0,2,0), cl.lim = c(-10, 40))
 
 # Moderate aggreement
 correlation_matrix_agreement_mod <- matrix(nrow = 9, ncol = 9, dimnames = list(c('80', '85', '90', '95', '100', '105', '110', '115', '120'),c('80', '85', '90', '95', '100', '105', '110', '115', '120'))) 
@@ -122,8 +125,7 @@ for (k in 1:8) {
 correlation_matrix_agreement_mod[is.na(correlation_matrix_agreement_mod)] <- 0
 
 corrplot(correlation_matrix_agreement_mod/ncol(dataset_80_features)*100, method = "number", type = "upper", tl.pos = "d", 
-         is.corr = FALSE, title="C (%)", mar=c(0,0,2,0), cl.lim = c(-10, 35))
-
+         is.corr = FALSE, title="C (%)", mar=c(0,0,2,0), cl.lim = c(-10, 38))
 
 # Poor aggreement
 correlation_matrix_agreement_poor <- matrix(nrow = 9, ncol = 9, dimnames = list(c('80', '85', '90', '95', '100', '105', '110', '115', '120'),c('80', '85', '90', '95', '100', '105', '110', '115', '120'))) 
@@ -136,7 +138,7 @@ for (k in 1:8) {
 correlation_matrix_agreement_poor[is.na(correlation_matrix_agreement_poor)] <- 0
 
 corrplot(correlation_matrix_agreement_poor/ncol(dataset_80_features)*100, method = "number", type = "upper", tl.pos = "d", 
-         is.corr = FALSE, title="D (%)", mar=c(0,0,2,0), cl.lim = c(-10, 30))
+         is.corr = FALSE, title="D (%)", mar=c(0,0,2,0), cl.lim = c(-10, 18))
 
 ##########################################
 ## Experiment with fixed TE and changing TR
@@ -145,7 +147,7 @@ filename_100_r <- paste(data_dir, "T2wAX_TE100 Range_clean.csv", sep = "") #read
 dataset_100_r <- read.csv(filename_100_r, header = TRUE, sep = sep)
 dataset_100_r_features <- dataset_100_r[ ,-seq(1,24)] 
 
-correlation_coefficients_agreement_TR <- sapply(seq.int(dim(dataset_100_r_features)[2]), function(i) psych::ICC(cbind(dataset_100_features[,i],dataset_100_r_features[,i]))$results$ICC[1])
+correlation_coefficients_agreement_TR <- sapply(seq.int(dim(dataset_100_r_features)[2]), function(i) DescTools::CCC(dataset_100_features[,i], dataset_100_r_features[,i])$rho.c$est)
 names(correlation_coefficients_agreement_TR) <- colnames(dataset_100_r_features)
 
 length(correlation_coefficients_agreement_TR[correlation_coefficients_agreement_TR > 0.9])
@@ -167,3 +169,4 @@ library(viridis)
 
 ggplot(data, aes(fill=condition, y=value, x=specie)) + 
   geom_bar(position="stack", stat="identity") # + scale_fill_viridis(discrete = T)
+

@@ -29,12 +29,14 @@ dataset_3D_Iso_r <- read.csv(filename_3D_Iso_r, header = TRUE, sep = sep)
 dataset_3D_Iso_r_features <- dataset_3D_Iso_r[ ,-seq(1,24)] 
 
 ## import libraries
-library(psych)
+# library(psych)
 library(caret)
-library(irr)
+# library(irr)
+library(DescTools)
 library(stringr)
 
-correlation_coefficients_agreement_3D <- sapply(seq.int(dim(dataset_3D_Iso_r_features)[2]), function(i) psych::ICC(cbind(dataset_3D_Iso_features[,i],dataset_3D_Iso_r_features[,i]))$results$ICC[1])
+# correlation_coefficients_agreement_3D <- sapply(seq.int(dim(dataset_3D_Iso_r_features)[2]), function(i) psych::ICC(cbind(dataset_3D_Iso_features[,i],dataset_3D_Iso_r_features[,i]))$results$ICC[1])
+correlation_coefficients_agreement_3D <- sapply(seq.int(dim(dataset_3D_Iso_r_features)[2]), function(i) DescTools::CCC(dataset_3D_Iso_features[,i],dataset_3D_Iso_r_features[,i])$rho.c$est)
 names(correlation_coefficients_agreement_3D) <- colnames(dataset_3D_Iso_r_features)
 
 length(correlation_coefficients_agreement_3D[correlation_coefficients_agreement_3D > 0.9])
@@ -61,6 +63,7 @@ for (filterType in c("original_", "log.sigma.1.mm.3D_", "wavelet.LLH_", "wavelet
 }
 
 high_agreement_features <- unique(unlist(featureType_high_agreement_feats))
+table(unlist(featureType_high_agreement_feats))
 
 ###################
 ## Filter Type

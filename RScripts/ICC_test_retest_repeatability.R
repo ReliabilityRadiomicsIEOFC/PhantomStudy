@@ -23,22 +23,21 @@ dataset_features_test <- dataset_test[ ,-seq(1,24)] # first 25 cols do not conta
 dataset_features_retest <- dataset_retest[ ,-seq(1,24)] # first 25 cols do not contain features
 
 ## import libraries
-library(psych)
 library(caret)
 library(irr)
 
 ## calculate ICCs
-correlation_coefficients_agreement <- sapply(seq.int(dim(dataset_features_test)[2]), function(j) irr::icc(cbind(dataset_features_test[,j], dataset_features_retest[,j]) ,type = 'agreement')$value)
+correlation_coefficients_agreement <- sapply(seq.int(dim(dataset_features_test)[2]), function(j) irr::icc(cbind(dataset_features_test[,j], dataset_features_retest[,j]), model = 'twoway', type = 'agreement')$value)
 names(correlation_coefficients_agreement) <- colnames(dataset_features_test)
 
 correlation_coefficients_agreement_excellent <- correlation_coefficients_agreement[correlation_coefficients_agreement > 0.9]
-table(correlation_coefficients_agreement_excellent)
+# table(correlation_coefficients_agreement_excellent)
 correlation_coefficients_agreement_good <- correlation_coefficients_agreement[correlation_coefficients_agreement > 0.75 & correlation_coefficients_agreement <= 0.9]
-table(correlation_coefficients_agreement_good)
+# table(correlation_coefficients_agreement_good)
 correlation_coefficients_agreement_moderate <- correlation_coefficients_agreement[correlation_coefficients_agreement >= 0.5 & correlation_coefficients_agreement <= 0.75]
-table(correlation_coefficients_agreement_moderate)
+# table(correlation_coefficients_agreement_moderate)
 correlation_coefficients_agreement_poor <- correlation_coefficients_agreement[correlation_coefficients_agreement < 0.5]
-table(correlation_coefficients_agreement_poor)
+# table(correlation_coefficients_agreement_poor)
 
 
 n_excellent_TR_exp <- length(correlation_coefficients_agreement[correlation_coefficients_agreement > 0.9]) / ncol(dataset_features_test)*100
