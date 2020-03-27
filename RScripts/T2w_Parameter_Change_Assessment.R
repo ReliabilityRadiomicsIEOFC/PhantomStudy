@@ -85,8 +85,6 @@ for (k in 1:8) {
   }
 }
 
-# par(mfrow=c(2,2))
-dev.off()
 library(corrplot)
 # Excellent aggreement
 correlation_matrix_agreement_exc <- matrix(nrow = 9, ncol = 9, dimnames = list(c('80', '85', '90', '95', '100', '105', '110', '115', '120'),c('80', '85', '90', '95', '100', '105', '110', '115', '120'))) 
