@@ -1,7 +1,7 @@
 set.seed(5)
 
 data_dir <- "<Folder_with_TE_TR_Experiment_Radiomics_Output>/" # put folder path here TE and TR Experimentradiomic output files are located
-data_dir <- "/Users/joaosantinha/Documents/FChampalimaud/Data/Phantom/PhantomStudy/RadiomicFiles/CCU1_5T_TE_TR/" # put folder path here TE and TR Experimentradiomic output files are located
+
 sep <- "," # choose separator
 
 ## Load doMC libraries
